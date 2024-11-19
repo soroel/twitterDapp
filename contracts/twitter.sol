@@ -9,6 +9,7 @@ contract Twitter {
         string content;
         uint256 timestamp;
         uint256 likes;
+        uint256 id;
     }
 
     // Mapping to associate users with their tweets
@@ -34,16 +35,33 @@ contract Twitter {
     // Create a new tweet
     function createTweet(string memory _tweet) public {
         require(bytes(_tweet).length <= MAX_TWEET_LENGTH, "Tweet is too long");
-
         Tweet memory newTweet = Tweet({
             author: msg.sender,
             content: _tweet,
             timestamp: block.timestamp,
-            likes: 0
+            likes: 0,
+            id: tweets[msg.sender].length
         });
+    
 
         tweets[msg.sender].push(newTweet);
     }
+
+    function likeTweet(address author, uint256 id) external {
+
+        require(tweets[author][id].id==id, "tweet does not exist");
+        tweets[author][id].likes++;
+
+    }
+
+    function unlikeTweet(address author, uint256 id) external {
+
+        require(tweets[author][id].id==id, "tweet does not exist");
+
+        require(tweets[author][id].likes>0, "No likes to remove");
+
+        tweets[author][id].likes--;
+}
 
     // Get a specific tweet by a user
     function getTweet(address _user, uint256 _index) public view returns (Tweet memory) {
